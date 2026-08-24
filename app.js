@@ -1,5 +1,12 @@
-// My AI Rank — models + harnesses in one app, switchable modes
-const TIER_ORDER = ['S+','A','B','C','D','F'];
+// My AI Rank — bilingual models + harnesses ranking board
+const EN_TIER_ORDER = ['S+','A','B','C','D','F'];
+const ZH_TIERS = [
+  { key: 'S+', label: '夯', source: ['S+'] },
+  { key: 'A', label: '顶级', source: ['A'] },
+  { key: 'B', label: '人上人', source: ['B'] },
+  { key: 'C', label: 'NPC', source: ['C'] },
+  { key: 'F', label: '拉完了', source: ['D', 'F'] }
+];
 
 const PROVIDERS = {
   openai: {
@@ -135,16 +142,52 @@ const PROVIDERS = {
     img: 'logos/orca.png'
   },
   opencode: {
-    name: 'opencode',
+    name: 'Opencode',
     bg: '#0b0b0c',
     type: 'img',
     img: 'logos/opencode.png'
   },
   commandcode: {
-    name: 'commandcode',
+    name: 'Commandcode',
     bg: '#000000',
     type: 'img',
     img: 'logos/commandcode.png'
+  },
+  antigravity: {
+    name: 'Antigravity',
+    bg: '#ffffff',
+    type: 'img',
+    img: 'logos/antigravity.svg'
+  },
+  cline: {
+    name: 'Cline',
+    bg: '#ffffff',
+    type: 'img',
+    img: 'logos/cline.svg'
+  },
+  codebuddy: {
+    name: 'Codebuddy',
+    bg: '#ffffff',
+    type: 'img',
+    img: 'logos/codebuddy.svg'
+  },
+  workbuddy: {
+    name: 'Workbuddy',
+    bg: '#6c4dff',
+    type: 'img',
+    img: 'logos/workbuddy.svg'
+  },
+  github: {
+    name: 'GitHub Copilot',
+    bg: '#ffffff',
+    type: 'img',
+    img: 'logos/github-copilot.svg'
+  },
+  traecode: {
+    name: 'TraeCode',
+    bg: '#17191d',
+    type: 'img',
+    img: 'logos/traecode.png'
   },
   other: {
     name: 'Other',
@@ -157,74 +200,120 @@ const PROVIDERS = {
 
 const DEFAULTS = {
   models: [
-    { id: 'm1', name: 'Fable 5', provider: 'anthropic' },
-    { id: 'm2', name: 'gpt-5.6-sol', provider: 'openai' },
-    { id: 'm3', name: 'Grok 4.5', provider: 'grok' },
-    { id: 'm4', name: 'kimi k3', provider: 'kimi' },
-    { id: 'm5', name: 'Grok 4.6', provider: 'grok' },
     { id: 'm6', name: 'deepseek v4 flash', provider: 'deepseek' },
-    { id: 'm7', name: 'gpt-5.6-luna', provider: 'openai' },
-    { id: 'm8', name: 'glm-5.3', provider: 'zhipu' },
-    { id: 'm9', name: 'Opus 5', provider: 'anthropic' },
-    { id: 'm10', name: 'Composer 2.5', provider: 'cursor' },
-    { id: 'm11', name: 'glm-5.2', provider: 'zhipu' },
-    { id: 'm12', name: 'gpt-5.6-terra', provider: 'openai' },
-    { id: 'm13', name: 'Sonnet 5', provider: 'anthropic' },
     { id: 'm14', name: 'deepseek v4 pro', provider: 'deepseek' },
-    { id: 'm15', name: 'Gemini 3.7 Flash', provider: 'google' },
+    { id: 'm1', name: 'Fable 5', provider: 'anthropic' },
     { id: 'm16', name: 'Gemini 3.1 Pro', provider: 'google' },
+    { id: 'm20', name: 'Gemini 3.6 Flash', provider: 'google' },
+    { id: 'm15', name: 'Gemini 3.7 Flash', provider: 'google' },
+    { id: 'm11', name: 'glm-5.2', provider: 'zhipu' },
+    { id: 'm8', name: 'glm-5.3', provider: 'zhipu' },
+    { id: 'm21', name: 'gpt-5.5', provider: 'openai' },
+    { id: 'm7', name: 'gpt-5.6-luna', provider: 'openai' },
+    { id: 'm2', name: 'gpt-5.6-sol', provider: 'openai' },
+    { id: 'm12', name: 'gpt-5.6-terra', provider: 'openai' },
+    { id: 'm3', name: 'Grok 4.5', provider: 'grok' },
+    { id: 'm5', name: 'Grok 4.6', provider: 'grok' },
+    { id: 'm4', name: 'kimi k3', provider: 'kimi' },
+    { id: 'm19', name: 'Muse Spark 1.2', provider: 'meta' },
+    { id: 'm22', name: 'Opus 4.8', provider: 'anthropic' },
+    { id: 'm9', name: 'Opus 5', provider: 'anthropic' },
+    { id: 'm23', name: 'Ox Alpha', provider: 'other' },
     { id: 'm17', name: 'Qwen-3.8-max', provider: 'qwen' },
-    { id: 'm18', name: 'swe-1.7', provider: 'cognition' },
-    { id: 'm19', name: 'Muse Spark 1.2', provider: 'meta' }
+    { id: 'm13', name: 'Sonnet 5', provider: 'anthropic' }
   ],
   harnesses: [
-    { id: 'h1', name: 'Devin', provider: 'devin' },
+    { id: 'h17', name: 'Antigravity', provider: 'antigravity' },
     { id: 'h2', name: 'Claude Code', provider: 'anthropic' },
+    { id: 'h18', name: 'Cline', provider: 'cline' },
+    { id: 'h19', name: 'Codebuddy', provider: 'codebuddy' },
     { id: 'h3', name: 'Codex', provider: 'openai' },
-    { id: 'h4', name: 'Zcode', provider: 'zhipu' },
-    { id: 'h5', name: 'Deepseek Harness', provider: 'deepseek' },
-    { id: 'h6', name: 'Kimi Code', provider: 'kimi' },
-    { id: 'h7', name: 'Qwen Code', provider: 'qwen' },
-    { id: 'h8', name: 'Grok Build', provider: 'grok' },
+    { id: 'h16', name: 'Commandcode', provider: 'commandcode' },
     { id: 'h9', name: 'Cursor', provider: 'cursor' },
+    { id: 'h5', name: 'Deepseek Agent', provider: 'deepseek' },
+    { id: 'h20', name: 'GitHub Copilot', provider: 'github' },
+    { id: 'h8', name: 'Grok Build', provider: 'grok' },
     { id: 'h10', name: 'Hermes Agent', provider: 'nous' },
+    { id: 'h6', name: 'Kimi Code', provider: 'kimi' },
+    { id: 'h15', name: 'Opencode', provider: 'opencode' },
     { id: 'h11', name: 'Pi', provider: 'pi' },
-    { id: 'h12', name: 'OMP', provider: 'omp' },
-    { id: 'h13', name: 't3code', provider: 't3code' },
-    { id: 'h14', name: 'Orca', provider: 'orca' },
-    { id: 'h15', name: 'opencode', provider: 'opencode' },
-    { id: 'h16', name: 'commandcode', provider: 'commandcode' }
+    { id: 'h7', name: 'Qwen Code', provider: 'qwen' },
+    { id: 'h13', name: 'T3code', provider: 't3code' },
+    { id: 'h22', name: 'TraeCode', provider: 'traecode' },
+    { id: 'h21', name: 'Workbuddy', provider: 'workbuddy' },
+    { id: 'h4', name: 'Zcode', provider: 'zhipu' }
   ]
 };
 
-const MODES = {
-  models: {
-    boardTitle: 'AI Model Rank',
-    brand: 'My AI Rank',
-    footNote: 'made with airank.dinosaurliu.com',
-    poolTitle: 'Models',
-    addPlaceholder: 'Add a new model…',
-    removeTitle: 'Remove this model',
-    dragHint: 'Drag a model card into a tier • ',
-    file: 'my-ai-rank-models.png',
-    shareTitle: 'My AI model rank',
-    shareBy: ' — created with My AI Rank',
-    addedMsg: 'New model added to the pool below.',
-    providers: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'kimi', 'qwen', 'zhipu', 'meta', 'cognition', 'cursor', 'other']
+const MODE_PROVIDERS = {
+  models: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'kimi', 'qwen', 'zhipu', 'meta', 'cognition', 'cursor', 'other'],
+  harnesses: ['antigravity', 'anthropic', 'cline', 'codebuddy', 'openai', 'commandcode', 'cursor', 'deepseek', 'github', 'grok', 'nous', 'kimi', 'opencode', 'pi', 'qwen', 't3code', 'traecode', 'workbuddy', 'zhipu', 'other']
+};
+
+const COPY = {
+  zh: {
+    subtitle: '将卡片拖入对应档位，然后把你的榜单导出为 PNG。',
+    namePlaceholder: '你的名字',
+    reset: '重置',
+    download: '下载 PNG',
+    copy: '复制 PNG',
+    add: '添加',
+    author: '作者',
+    screenshotLoading: '截图组件仍在加载，请稍后再试。',
+    downloaded: 'PNG 已下载。',
+    rendering: '正在生成 PNG…',
+    copied: '已复制到剪贴板，可以粘贴到任意位置。',
+    clipboardFallback: '无法访问剪贴板，已改为下载 PNG。',
+    resetDone: '所有卡片已回到待排名区域。',
+    removed: name => `“${name}”已移除。`,
+    exportFailed: message => `导出失败：${message}`,
+    modes: {
+      models: {
+        boardTitle: 'AI 模型榜单', poolTitle: 'Models', addPlaceholder: '添加新模型…',
+        removeTitle: '移除这个模型', dragHint: '将模型卡片拖入档位 • ',
+        file: 'my-ai-rank-models-zh.png', shareTitle: '我的 AI 模型榜单',
+        shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新模型已添加到下方待排名区域。'
+      },
+      harnesses: {
+        boardTitle: 'AI Agent榜单', poolTitle: 'Agent', addPlaceholder: '添加新工具…',
+        removeTitle: '移除这个工具', dragHint: '将工具卡片拖入档位 • ',
+        file: 'my-ai-rank-agents-zh.png', shareTitle: '我的 AI Agent榜单',
+        shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新工具已添加到下方待排名区域。'
+      }
+    },
+    footNote: '使用 andrew-liu.github.io/ai-rank 制作'
   },
-  harnesses: {
-    boardTitle: 'AI Harness Rank',
-    brand: 'My AI Rank',
-    footNote: 'made with airank.dinosaurliu.com',
-    poolTitle: 'Harnesses',
-    addPlaceholder: 'Add a new harness…',
-    removeTitle: 'Remove this harness',
-    dragHint: 'Drag a harness card into a tier • ',
-    file: 'my-ai-rank-harnesses.png',
-    shareTitle: 'My AI harness rank',
-    shareBy: ' — created with My AI Rank',
-    addedMsg: 'New harness added to the pool below.',
-    providers: ['devin', 'cognition', 'anthropic', 'openai', 'zhipu', 'deepseek', 'kimi', 'qwen', 'xai', 'grok', 'cursor', 'nous', 'pi', 'omp', 't3code', 'orca', 'opencode', 'commandcode', 'other']
+  en: {
+    subtitle: 'Drag the cards into tiers, then export your ranking as a PNG.',
+    namePlaceholder: 'Your name',
+    reset: 'Reset',
+    download: 'Download PNG',
+    copy: 'Copy PNG',
+    add: 'Add',
+    author: 'by',
+    screenshotLoading: 'Screenshot library is still loading — please try again in a second.',
+    downloaded: 'Your PNG has been downloaded.',
+    rendering: 'Rendering your PNG…',
+    copied: 'Copied to clipboard — you can paste it anywhere.',
+    clipboardFallback: 'Clipboard access was blocked, so the PNG was downloaded instead.',
+    resetDone: 'All cards are back in the pool.',
+    removed: name => `"${name}" has been removed.`,
+    exportFailed: message => `Export failed: ${message}`,
+    modes: {
+      models: {
+        boardTitle: 'AI Model Rank', poolTitle: 'Models', addPlaceholder: 'Add a new model…',
+        removeTitle: 'Remove this model', dragHint: 'Drag a model card into a tier • ',
+        file: 'my-ai-rank-models.png', shareTitle: 'My AI model rank',
+        shareBy: ' — created with My AI Rank', addedMsg: 'New model added to the pool below.'
+      },
+      harnesses: {
+        boardTitle: 'AI Agent Rank', poolTitle: 'Agent', addPlaceholder: 'Add a new agent…',
+        removeTitle: 'Remove this agent', dragHint: 'Drag an agent card into a tier • ',
+        file: 'my-ai-rank-agents.png', shareTitle: 'My AI Agent Rank',
+        shareBy: ' — created with My AI Rank', addedMsg: 'New agent added to the pool below.'
+      }
+    },
+    footNote: 'made with andrew-liu.github.io/ai-rank'
   }
 };
 
@@ -274,8 +363,19 @@ const state = {
   models: DEFAULTS.models.map((m, i) => ({ ...m, tier: 'pool', sort: i })),
   harnesses: DEFAULTS.harnesses.map((m, i) => ({ ...m, tier: 'pool', sort: i }))
 };
-let mode = new URLSearchParams(location.search).get('mode') === 'harnesses' ? 'harnesses' : 'models';
+const initialParams = new URLSearchParams(location.search);
+let mode = initialParams.get('mode') === 'harnesses' ? 'harnesses' : 'models';
+const urlLanguage = initialParams.get('lang');
+let language = urlLanguage === 'en' || urlLanguage === 'zh'
+  ? urlLanguage
+  : (localStorage.getItem('ai-rank-language') === 'en' ? 'en' : 'zh');
 function items() { return state[mode]; }
+function modeCopy() { return COPY[language].modes[mode]; }
+function visibleTiers() {
+  return language === 'zh'
+    ? ZH_TIERS
+    : EN_TIER_ORDER.map(tier => ({ key: tier, label: tier, source: [tier] }));
+}
 let dragId = null;
 
 const tierRowsEl = document.getElementById('tier-rows');
@@ -296,30 +396,32 @@ function updateAuthor() {
   const name = nameInput.value.trim();
   const handle = readHandle();
   let text = '';
-  if (name && handle) text = `by ${escapeHtml(name)} (${escapeHtml(handle)})`;
-  else if (name) text = `by ${escapeHtml(name)}`;
-  else if (handle) text = `by ${escapeHtml(handle)}`;
+  const prefix = COPY[language].author;
+  if (name && handle) text = language === 'zh' ? `${prefix}：${name}（${handle}）` : `${prefix} ${name} (${handle})`;
+  else if (name) text = language === 'zh' ? `${prefix}：${name}` : `${prefix} ${name}`;
+  else if (handle) text = language === 'zh' ? `${prefix}：${handle}` : `${prefix} ${handle}`;
   boardAuthorEl.textContent = text;
 }
 
 function cardHtml(m) {
+  const removeTitle = modeCopy().removeTitle;
   return `<div class="model-card" draggable="true" data-id="${escapeHtml(m.id)}">
     ${iconFor(m.provider, m.name)}
     <span class="model-name">${escapeHtml(m.name)}</span>
     <span class="drag-handle">⋮⋮</span>
-    <button class="card-del screen-only" type="button" title="${MODES[mode].removeTitle}" aria-label="Remove ${escapeHtml(m.name)}">×</button>
+    <button class="card-del screen-only" type="button" title="${removeTitle}" aria-label="${removeTitle} ${escapeHtml(m.name)}">×</button>
   </div>`;
 }
 
 function render() {
   tierRowsEl.innerHTML = '';
-  for (const tier of TIER_ORDER) {
+  for (const tier of visibleTiers()) {
     const lane = document.createElement('div');
     lane.className = 'tier-row';
-    lane.innerHTML = `<div class="tier-label" data-tier="${escapeHtml(tier)}">${escapeHtml(tier)}</div>
-                      <div class="tier-lane" data-tier="${escapeHtml(tier)}"></div>`;
+    lane.innerHTML = `<div class="tier-label" data-tier="${escapeHtml(tier.key)}">${escapeHtml(tier.label)}</div>
+                      <div class="tier-lane" data-tier="${escapeHtml(tier.key)}"></div>`;
     const laneInner = lane.querySelector('.tier-lane');
-    const tierModels = items().filter(m => m.tier === tier).sort((a,b) => a.sort - b.sort);
+    const tierModels = items().filter(m => tier.source.includes(m.tier)).sort((a,b) => a.sort - b.sort);
     for (const m of tierModels) {
       const card = document.createElement('div');
       card.innerHTML = cardHtml(m);
@@ -351,7 +453,7 @@ function bindCard(el, m) {
       e.stopPropagation();
       state[mode] = items().filter(x => x.id !== m.id);
       render();
-      setStatus(`"${m.name}" has been removed.`, 'info');
+      setStatus(COPY[language].removed(m.name), 'info');
     });
   }
   el.addEventListener('dragstart', e => {
@@ -414,18 +516,17 @@ function setStatus(msg, kind='info') {
 function buildShareText() {
   const name = nameInput.value.trim();
   const handle = readHandle();
-  let text = '';
-  if (name) text += `${MODES[mode].shareTitle} by ${name}`;
-  else text += MODES[mode].shareTitle;
+  const cfg = modeCopy();
+  let text = cfg.shareTitle;
+  if (name) text += language === 'zh' ? `，作者：${name}` : ` by ${name}`;
   if (handle && handle !== name) text += ` (${handle})`;
-  text += MODES[mode].shareBy;
-  if (handle) text += ` @${handle.replace('@','')}`;
+  text += cfg.shareBy;
   return text;
 }
 
 async function exportPNG(download = false) {
   if (typeof html2canvas === 'undefined') {
-    setStatus('Screenshot library is still loading — please try again in a second.', 'error');
+    setStatus(COPY[language].screenshotLoading, 'error');
     return;
   }
   updateAuthor();
@@ -448,35 +549,35 @@ async function exportPNG(download = false) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = MODES[mode].file;
+      a.download = modeCopy().file;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setStatus('Your PNG has been downloaded.', 'success');
+      setStatus(COPY[language].downloaded, 'success');
     }
     return blob;
   } catch (err) {
     console.error(err);
-    setStatus('Export failed: ' + err.message, 'error');
+    setStatus(COPY[language].exportFailed(err.message), 'error');
   }
 }
 
 // Plain clipboard copy — no X involved. Same resolved-blob discipline as shareOnX:
 // render first, write while the tab is focused and the click's activation lasts.
 async function copyToClipboard() {
-  setStatus('Rendering your PNG…');
+  setStatus(COPY[language].rendering);
   const blob = await exportPNG(false);
   if (!blob) return;
   if (navigator.clipboard && window.ClipboardItem) {
     try {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      setStatus('Copied to clipboard — you can paste it anywhere.', 'success');
+      setStatus(COPY[language].copied, 'success');
       return;
     } catch (err) {
       console.error(err);
     }
   }
   downloadBlob(blob);
-  setStatus('Clipboard access was blocked, so the PNG was downloaded instead.', 'info');
+  setStatus(COPY[language].clipboardFallback, 'info');
 }
 
 // The native share sheet only earns its keep on mobile, where the X app is a
@@ -503,7 +604,7 @@ function downloadBlob(blob) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = MODES[mode].file;
+  a.download = modeCopy().file;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -519,10 +620,10 @@ async function shareOnX() {
   if (!blob) return;
 
   if (canShareFiles()) {
-    const file = new File([blob], MODES[mode].file, { type: 'image/png' });
+    const file = new File([blob], modeCopy().file, { type: 'image/png' });
     try {
-      await navigator.share({ files: [file], title: MODES[mode].shareTitle, text });
-      setStatus('Share sheet opened. Pick X to post with the image.', 'success');
+      await navigator.share({ files: [file], title: modeCopy().shareTitle, text });
+      setStatus(language === 'zh' ? '分享菜单已打开，请选择 X 发布图片。' : 'Share sheet opened. Pick X to post with the image.', 'success');
     } catch (err) {
       if (err.name === 'AbortError') return;
       console.error(err);
@@ -569,7 +670,7 @@ async function copyThenCompose(blob, intentUrl) {
 
 function populateProviderSelect() {
   const sel = document.getElementById('new-provider');
-  const keys = MODES[mode].providers;
+  const keys = MODE_PROVIDERS[mode];
   sel.innerHTML = Object.entries(PROVIDERS)
     .filter(([k]) => keys.includes(k))
     .sort((a,b) => (a[1].name === 'Other' ? 1 : b[1].name === 'Other' ? -1 : a[1].name.localeCompare(b[1].name)))
@@ -578,39 +679,72 @@ function populateProviderSelect() {
   sel.value = 'other';
 }
 
-// Switch Models ⇄ Harnesses: retitle the board/pool, refill the provider
-// select, re-render, and keep ?mode= in the URL for deep links.
-function setMode(next) {
-  if (!MODES[next] || next === mode) return;
-  mode = next;
-  applyMode();
-  history.replaceState(null, '', next === 'models' ? location.pathname : `${location.pathname}?mode=${next}`);
+// Keep mode and language in the URL so either version can be shared directly.
+function syncUrl() {
+  const params = new URLSearchParams();
+  if (mode === 'harnesses') params.set('mode', mode);
+  params.set('lang', language);
+  const query = params.toString();
+  history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}`);
 }
 
-function applyMode() {
-  const cfg = MODES[mode];
+function setMode(next) {
+  if (!MODE_PROVIDERS[next] || next === mode) return;
+  mode = next;
+  applyUi();
+  syncUrl();
+}
+
+function setLanguage(next) {
+  if (!COPY[next] || next === language) return;
+  language = next;
+  localStorage.setItem('ai-rank-language', language);
+  applyUi();
+  syncUrl();
+}
+
+function applyUi() {
+  const text = COPY[language];
+  const cfg = modeCopy();
+  document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
   document.querySelectorAll('.mode-tab').forEach(t => {
     const on = t.dataset.mode === mode;
     t.classList.toggle('active', on);
     t.setAttribute('aria-selected', String(on));
   });
-  document.title = `My AI Rank — ${mode === 'models' ? 'Models' : 'Harnesses'}`;
+  document.querySelectorAll('.language-tab').forEach(t => {
+    const on = t.dataset.lang === language;
+    t.classList.toggle('active', on);
+    t.setAttribute('aria-pressed', String(on));
+  });
+  document.title = `My AI Rank — ${mode === 'models' ? 'Models' : 'Agent'}`;
+  document.querySelector('meta[name="description"]').content = text.subtitle;
+  document.getElementById('page-subtitle').textContent = text.subtitle;
+  nameInput.placeholder = text.namePlaceholder;
+  document.getElementById('btn-reset').textContent = text.reset;
+  document.getElementById('btn-export').textContent = text.download;
+  document.getElementById('btn-copy').textContent = text.copy;
+  document.getElementById('btn-add').textContent = text.add;
   document.getElementById('board-title').textContent = cfg.boardTitle;
   document.getElementById('board-meta-drag').textContent = cfg.dragHint;
-  document.getElementById('board-brand').textContent = cfg.brand;
-  document.getElementById('board-brand-png').textContent = cfg.brand;
-  // board-foot-brand keeps its static link (airank.dinosaurliu.com) from the HTML.
-  document.getElementById('board-foot-note-text').textContent = cfg.footNote;
+  document.getElementById('board-brand').textContent = 'My AI Rank';
+  document.getElementById('board-brand-png').textContent = 'My AI Rank';
+  document.getElementById('board-foot-note-text').textContent = text.footNote;
   document.getElementById('pool-title').textContent = cfg.poolTitle;
   document.getElementById('new-model').placeholder = cfg.addPlaceholder;
+  statusEl.textContent = '';
   populateProviderSelect();
+  updateAuthor();
   render();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.mode-tab').forEach(t =>
     t.addEventListener('click', () => setMode(t.dataset.mode)));
-  applyMode();
+  document.querySelectorAll('.language-tab').forEach(t =>
+    t.addEventListener('click', () => setLanguage(t.dataset.lang)));
+  applyUi();
+  syncUrl();
   nameInput.addEventListener('input', updateAuthor);
   handleInput.addEventListener('input', updateAuthor);
 
@@ -619,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-reset').addEventListener('click', () => {
     items().forEach(m => m.tier = 'pool');
     render();
-    setStatus('All cards are back in the pool.', 'info');
+    setStatus(COPY[language].resetDone, 'info');
   });
 
   document.getElementById('add-form').addEventListener('submit', e => {
@@ -630,9 +764,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!name) return;
     const key = sel.value || 'other';
     const id = 'c-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,5);
-    items().push({ id, name, provider: key, tier: 'pool', custom: true });
+    items().push({ id, name, provider: key, tier: 'pool', sort: items().length, custom: true });
     input.value = '';
     render();
-    setStatus(MODES[mode].addedMsg, 'success');
+    setStatus(modeCopy().addedMsg, 'success');
   });
 });

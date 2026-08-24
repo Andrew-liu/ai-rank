@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My AI Rank</title>
-<meta name="description" content="Rank AI models and coding harnesses your way, then export the board as a PNG.">
+<meta name="description" content="按你的方式排列 AI 模型和编程工具，并将榜单导出为 PNG。">
 <meta property="og:title" content="My AI Rank">
-<meta property="og:description" content="Rank AI models and coding harnesses your way, then export the board as a PNG.">
+<meta property="og:description" content="按你的方式排列 AI 模型和编程工具，并将榜单导出为 PNG。">
 <link rel="icon" href="assets/img/logo.png" type="image/png">
 <script src="tailwind.js"></script>
 <script>
@@ -41,27 +41,33 @@ tailwind.config = {
       <img src="assets/img/logo.png" alt="My AI Rank logo" width="26" height="26" class="rounded-md">
       <span class="font-mono text-[0.85rem] font-medium tracking-[0.02em]">My&nbsp;AI&nbsp;Rank</span>
     </a>
-    <a class="flex items-center gap-2 font-mono text-[0.8rem] tracking-[0.02em] text-muted hover:text-accent transition-colors" href="https://x.com/xueyu1125" target="_blank" rel="noopener">
-      <img src="assets/img/x.svg" alt="" width="13" height="13"><span>@xueyu1125&nbsp;↗</span>
-    </a>
+    <div class="header-actions">
+      <div class="language-switch" role="group" aria-label="Language">
+        <button class="language-tab active" data-lang="zh" type="button" aria-pressed="true">ZH</button>
+        <button class="language-tab" data-lang="en" type="button" aria-pressed="false">EN</button>
+      </div>
+      <a class="flex items-center gap-2 font-mono text-[0.8rem] tracking-[0.02em] text-muted hover:text-accent transition-colors" href="https://x.com/xueyu1125" target="_blank" rel="noopener">
+        <img src="assets/img/x.svg" alt="" width="13" height="13"><span>@xueyu1125&nbsp;↗</span>
+      </a>
+    </div>
   </header>
 
   <main class="flex-1 w-full max-w-[1360px] mx-auto px-5 sm:px-8 pt-8 pb-12">
     <div class="flex flex-wrap items-end justify-between gap-6 mb-6">
       <div class="min-w-0">
         <h1 class="font-display font-extrabold uppercase leading-[0.95] tracking-tight [font-stretch:125%] text-[clamp(2rem,5vw,3.6rem)] mb-2.5">My AI Rank</h1>
-        <p class="font-mono text-[0.8rem] tracking-[0.02em] text-muted">Drag the cards into tiers, then export your ranking as a PNG.</p>
-<div class="mode-switch" role="tablist" aria-label="Ranking mode">
+        <p id="page-subtitle" class="font-mono text-[0.8rem] tracking-[0.02em] text-muted">将卡片拖入对应档位，然后把你的榜单导出为 PNG。</p>
+        <div class="mode-switch" role="tablist" aria-label="Ranking mode">
           <button class="mode-tab active" data-mode="models" role="tab" aria-selected="true" type="button">Models</button>
-          <button class="mode-tab" data-mode="harnesses" role="tab" aria-selected="false" type="button">Harnesses</button>
+          <button class="mode-tab" data-mode="harnesses" role="tab" aria-selected="false" type="button">Agent</button>
         </div>
       </div>
       <div class="flex flex-wrap items-center gap-3">
-        <input id="name" class="tl-input" type="text" placeholder="Your name">
+        <input id="name" class="tl-input" type="text" placeholder="你的名字">
         <input id="handle" class="tl-input" type="text" placeholder="@xhandle">
-        <button id="btn-reset" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors" type="button">Reset</button>
-        <button id="btn-export" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] rounded-sm bg-accent text-[#0b0b0c] font-medium hover:bg-[#d8ff70] transition-colors" type="button">Download PNG</button>
-        <button id="btn-copy" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors" type="button">Copy PNG</button>
+        <button id="btn-reset" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors" type="button">重置</button>
+        <button id="btn-export" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] rounded-sm bg-accent text-[#0b0b0c] font-medium hover:bg-[#d8ff70] transition-colors" type="button">下载 PNG</button>
+        <button id="btn-copy" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors" type="button">复制 PNG</button>
       </div>
       <div id="status" class="tl-status w-full text-right"></div>
     </div>
@@ -70,18 +76,18 @@ tailwind.config = {
       <div id="tier-board" class="tier-board">
         <div class="board-header">
           <div>
-            <h2 class="board-title" id="board-title">AI Model Rank</h2>
+            <h2 class="board-title" id="board-title">AI 模型榜单</h2>
             <div id="board-meta" class="board-meta">
-              <span class="screen-only" id="board-meta-drag">Drag a model card into a tier • </span><span class="png-only" id="board-brand-png">My AI Rank</span><span class="screen-only" id="board-brand">My AI Rank</span>
+              <span class="screen-only" id="board-meta-drag">将模型卡片拖入档位 • </span><span class="png-only" id="board-brand-png">My AI Rank</span><span class="screen-only" id="board-brand">My AI Rank</span>
             </div>
           </div>
           <div id="board-author" class="board-author"></div>
         </div>
         <div id="tier-rows"></div>
         <div class="board-footer">
-          <span class="screen-only" id="board-foot-brand"><a href="https://airank.dinosaurliu.com/" target="_blank" rel="noopener">airank.dinosaurliu.com</a></span>
+          <span class="screen-only" id="board-foot-brand"><a href="https://andrew-liu.github.io/ai-rank/" target="_blank" rel="noopener">andrew-liu.github.io/ai-rank</a></span>
           <span class="tl-footer-note png-only" id="board-foot-note">
-            <span id="board-foot-note-text">made with airank.dinosaurliu.com</span>
+            <span id="board-foot-note-text">使用 andrew-liu.github.io/ai-rank 制作</span>
           </span>
         </div>
       </div>
@@ -93,9 +99,9 @@ tailwind.config = {
         </div>
         <div id="pool-list" class="pool-list"></div>
         <form id="add-form" class="tl-add">
-          <input id="new-model" class="tl-input" type="text" placeholder="Add a new model…" required autocomplete="off">
+          <input id="new-model" class="tl-input" type="text" placeholder="添加新模型…" required autocomplete="off">
           <select id="new-provider" class="tl-select"></select>
-          <button type="submit" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors">Add</button>
+          <button id="btn-add" type="submit" class="px-4 py-2.5 font-mono text-[0.8rem] tracking-[0.02em] border border-linestrong rounded-sm text-ink hover:border-accent hover:text-accent transition-colors">添加</button>
         </form>
       </aside>
     </div>
