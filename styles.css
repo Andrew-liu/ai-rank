@@ -1,0 +1,368 @@
+/* My AI Rank — tier board styles (kept as-is, S+ to F board must not change)
+ * Page layout / header / footer / buttons are handled by Tailwind in index.html.
+ * CSS variables previously provided by assets/styles.css are defined here. */
+
+/* ---------- Local fonts (no CDN) ---------- */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('assets/fonts/archivo-var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('assets/fonts/plexmono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('assets/fonts/plexmono-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('assets/fonts/jetbrainsmono-var.woff2') format('woff2');
+}
+
+:root {
+  --bg: #0b0b0c;
+  --bg-raise: #121214;
+  --ink: #f0ede6;
+  --muted: #8a8781;
+  --accent: #c6ff3e;
+  --accent-hover: #d8ff70;
+  --line: rgba(240, 237, 230, 0.14);
+  --line-strong: rgba(240, 237, 230, 0.32);
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  /* Board interior (S+ to F, PNG export) — locked to the original pairing. */
+  --font-mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  /* Page UI outside the board — more readable mono. */
+  --font-mono-ui: "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- Mode switch (Models / Harnesses) ---------- */
+.mode-switch {
+  display: inline-flex;
+  margin-top: 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mode-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.mode-tab + .mode-tab { border-left: 1px solid var(--line-strong); }
+.mode-tab:hover { color: var(--ink); }
+.mode-tab.active { background: var(--accent); color: #0b0b0c; font-weight: 500; }
+.mode-tab.active:hover { color: #0b0b0c; }
+
+/* ---------- Inputs / status ---------- */
+.tl-input,
+.tl-select {
+  background: var(--bg-raise);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 10px 12px;
+  font-family: var(--font-mono-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  border-radius: 2px;
+  min-width: 150px;
+}
+
+.tl-input::placeholder { color: var(--muted); }
+
+.tl-select { min-width: 130px; cursor: pointer; }
+
+.tl-status {
+  font-family: var(--font-mono-ui);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  min-height: 1.2em;
+  flex-basis: 100%;
+}
+.tl-status:empty { display: none; }
+.tl-status a { color: var(--accent); border-bottom: 1px solid var(--accent); }
+
+/* ---------- Tier board (S+ to F — unchanged) ---------- */
+.tier-board {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-raise);
+  overflow: hidden;
+}
+
+.board-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.board-title {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.board-meta,
+.board-author {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.tier-row {
+  display: grid;
+  grid-template-columns: minmax(70px, max-content) 1fr;
+  min-height: 78px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tier-row:last-child { border-bottom: none; }
+
+.tier-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--bg);
+  text-transform: uppercase;
+  user-select: none;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.tier-label[data-tier="S+"] { background: #ff5b6b; }
+.tier-label[data-tier="A"]  { background: #f2a25b; }
+.tier-label[data-tier="B"]  { background: #f2c45b; }
+.tier-label[data-tier="C"]  { background: #66c46a; }
+.tier-label[data-tier="D"]  { background: #a866e0; }
+.tier-label[data-tier="F"]  { background: #e055aa; }
+
+.tier-lane,
+.pool-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+  padding: 14px;
+  min-height: 78px;
+  transition: background 0.15s;
+}
+
+.tier-lane.drag-over,
+.pool-list.drag-over {
+  background: rgba(198, 255, 62, 0.08);
+  outline: 1px dashed var(--accent);
+}
+
+/* ---------- Pool ---------- */
+.model-pool {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-raise);
+  padding: 20px;
+}
+
+.pool-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  gap: 12px;
+}
+
+.pool-title {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.pool-count {
+  font-family: var(--font-mono-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ---------- Model cards ---------- */
+.model-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #161619;
+  cursor: grab;
+  user-select: none;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: transform 0.1s, border-color 0.1s;
+  position: relative;
+}
+
+.model-card:hover { border-color: var(--accent); }
+
+.model-card.dragging { opacity: 0.4; }
+
+.model-card .provider-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.model-card .provider-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.model-card .provider-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-del {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-raise);
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+  z-index: 5;
+  padding: 0;
+}
+.model-card:hover .card-del,
+.card-del:focus-visible { opacity: 1; }
+.card-del:hover { color: #ff5b6b; border-color: #ff5b6b; }
+
+.model-card .model-name { white-space: nowrap; }
+
+.model-card .drag-handle {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-left: 2px;
+  letter-spacing: -0.05em;
+}
+
+/* ---------- Board footer ---------- */
+.board-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  color: var(--muted);
+}
+
+.tl-footer-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tl-footer-note img,
+.tl-footer-note .x-mark { display: block; }
+
+.x-mark { fill: currentColor; color: var(--ink); }
+
+.board-footer .tl-footer-note {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.board-footer .tl-footer-note .x-mark { color: var(--accent); width: 15px; height: 15px; }
+.board-footer .tl-footer-note a {
+  color: var(--ink);
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 2px;
+  transition: color 0.18s, border-color 0.18s;
+}
+.board-footer .tl-footer-note a:hover { color: var(--accent); border-color: var(--accent); }
+.board-footer .tl-footer-note.png-only { color: var(--ink); }
+
+/* ---------- Add form ---------- */
+.tl-add {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  max-width: 640px;
+}
+
+.tl-add input { flex: 1 1 160px; }
+.tl-add select { flex: 1 1 120px; }
+
+.png-only { display: none; }
