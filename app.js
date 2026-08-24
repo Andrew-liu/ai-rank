@@ -281,7 +281,7 @@ const COPY = {
         shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新工具已添加到下方待排名区域。'
       }
     },
-    footNote: '使用 andrew-liu.github.io/ai-rank 制作'
+    footNote: '使用 airank.dinosaurliu.com 制作'
   },
   en: {
     subtitle: 'Drag the cards into tiers, then export your ranking as a PNG.',
@@ -313,7 +313,7 @@ const COPY = {
         shareBy: ' — created with My AI Rank', addedMsg: 'New agent added to the pool below.'
       }
     },
-    footNote: 'made with andrew-liu.github.io/ai-rank'
+    footNote: 'made with airank.dinosaurliu.com'
   }
 };
 

@@ -2,13 +2,13 @@
   <h1>My AI Rank</h1>
   <p>
     <a href="https://github.com/Andrew-liu/ai-rank/stargazers"><img src="https://img.shields.io/github/stars/Andrew-liu/ai-rank?style=flat-square&amp;color=c6ff3e" alt="GitHub stars"></a>
-    <a href="https://andrew-liu.github.io/ai-rank/"><img src="https://img.shields.io/badge/Live-My%20AI%20Rank-c6ff3e?style=flat-square" alt="Live site"></a>
+    <a href="https://airank.dinosaurliu.com/"><img src="https://img.shields.io/badge/Live-My%20AI%20Rank-c6ff3e?style=flat-square" alt="Live site"></a>
     <a href="https://github.com/Andrew-liu/ai-rank/actions/workflows/deploy.yml"><img src="https://img.shields.io/github/actions/workflow/status/Andrew-liu/ai-rank/deploy.yml?branch=main&amp;label=deploy&amp;style=flat-square" alt="Deploy workflow"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="MIT License"></a>
   </p>
   <p>Create your own tier list for AI models and agents.</p>
   <p>
-    <a href="https://andrew-liu.github.io/ai-rank/">Live site</a> ·
+    <a href="https://airank.dinosaurliu.com/">Live site</a> ·
     <a href="README.md">简体中文</a>
   </p>
 </div>
