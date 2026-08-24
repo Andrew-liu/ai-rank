@@ -268,13 +268,13 @@ const COPY = {
     modes: {
       models: {
         boardTitle: 'AI 模型榜单', poolTitle: 'Models', addPlaceholder: '添加新模型…',
-        removeTitle: '移除这个模型', dragHint: '将模型卡片拖入档位 • ',
+        removeTitle: '移除这个模型', returnTitle: '返回待选模型', dragHint: '将模型卡片拖入档位 • ',
         file: 'my-ai-rank-models-zh.png', shareTitle: '我的 AI 模型榜单',
         shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新模型已添加到下方待排名区域。'
       },
       harnesses: {
         boardTitle: 'AI Agent榜单', poolTitle: 'Agents', addPlaceholder: '添加新工具…',
-        removeTitle: '移除这个工具', dragHint: '将工具卡片拖入档位 • ',
+        removeTitle: '移除这个工具', returnTitle: '返回待选 Agent', dragHint: '将工具卡片拖入档位 • ',
         file: 'my-ai-rank-agents-zh.png', shareTitle: '我的 AI Agent榜单',
         shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新工具已添加到下方待排名区域。'
       }
@@ -298,13 +298,13 @@ const COPY = {
     modes: {
       models: {
         boardTitle: 'AI Model Rank', poolTitle: 'Models', addPlaceholder: 'Add a new model…',
-        removeTitle: 'Remove this model', dragHint: 'Drag a model card into a tier • ',
+        removeTitle: 'Remove this model', returnTitle: 'Return this model to the pool', dragHint: 'Drag a model card into a tier • ',
         file: 'my-ai-rank-models.png', shareTitle: 'My AI model rank',
         shareBy: ' — created with My AI Rank', addedMsg: 'New model added to the pool below.'
       },
       harnesses: {
         boardTitle: 'AI Agent Rank', poolTitle: 'Agents', addPlaceholder: 'Add a new agent…',
-        removeTitle: 'Remove this agent', dragHint: 'Drag an agent card into a tier • ',
+        removeTitle: 'Remove this agent', returnTitle: 'Return this agent to the pool', dragHint: 'Drag an agent card into a tier • ',
         file: 'my-ai-rank-agents.png', shareTitle: 'My AI Agent Rank',
         shareBy: ' — created with My AI Rank', addedMsg: 'New agent added to the pool below.'
       }
@@ -404,12 +404,12 @@ function updateAuthor() {
 }
 
 function cardHtml(m) {
-  const removeTitle = modeCopy().removeTitle;
+  const actionTitle = m.tier === 'pool' ? modeCopy().removeTitle : modeCopy().returnTitle;
   return `<div class="model-card" draggable="true" data-id="${escapeHtml(m.id)}">
     ${iconFor(m.provider, m.name)}
     <span class="model-name">${escapeHtml(m.name)}</span>
     <span class="drag-handle">⋮⋮</span>
-    <button class="card-del screen-only" type="button" title="${removeTitle}" aria-label="${removeTitle} ${escapeHtml(m.name)}">×</button>
+    <button class="card-del screen-only" type="button" title="${actionTitle}" aria-label="${actionTitle} ${escapeHtml(m.name)}">×</button>
   </div>`;
 }
 
@@ -433,7 +433,9 @@ function render() {
     tierRowsEl.appendChild(lane);
   }
   poolListEl.innerHTML = '';
-  const poolModels = items().filter(m => m.tier === 'pool').sort((a,b) => a.sort - b.sort);
+  const poolModels = items()
+    .filter(m => m.tier === 'pool')
+    .sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
   for (const m of poolModels) {
     const card = document.createElement('div');
     card.innerHTML = cardHtml(m);
@@ -451,7 +453,11 @@ function bindCard(el, m) {
     del.addEventListener('dragstart', e => e.preventDefault());
     del.addEventListener('click', e => {
       e.stopPropagation();
-      state[mode] = items().filter(x => x.id !== m.id);
+      if (m.tier === 'pool') {
+        state[mode] = items().filter(x => x.id !== m.id);
+      } else {
+        m.tier = 'pool';
+      }
       render();
     });
   }
