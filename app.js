@@ -264,8 +264,6 @@ const COPY = {
     rendering: '正在生成 PNG…',
     copied: '已复制到剪贴板，可以粘贴到任意位置。',
     clipboardFallback: '无法访问剪贴板，已改为下载 PNG。',
-    resetDone: '所有卡片已回到待排名区域。',
-    removed: name => `“${name}”已移除。`,
     exportFailed: message => `导出失败：${message}`,
     modes: {
       models: {
@@ -275,7 +273,7 @@ const COPY = {
         shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新模型已添加到下方待排名区域。'
       },
       harnesses: {
-        boardTitle: 'AI Agent榜单', poolTitle: 'Agent', addPlaceholder: '添加新工具…',
+        boardTitle: 'AI Agent榜单', poolTitle: 'Agents', addPlaceholder: '添加新工具…',
         removeTitle: '移除这个工具', dragHint: '将工具卡片拖入档位 • ',
         file: 'my-ai-rank-agents-zh.png', shareTitle: '我的 AI Agent榜单',
         shareBy: ' — 使用 My AI Rank 制作', addedMsg: '新工具已添加到下方待排名区域。'
@@ -296,8 +294,6 @@ const COPY = {
     rendering: 'Rendering your PNG…',
     copied: 'Copied to clipboard — you can paste it anywhere.',
     clipboardFallback: 'Clipboard access was blocked, so the PNG was downloaded instead.',
-    resetDone: 'All cards are back in the pool.',
-    removed: name => `"${name}" has been removed.`,
     exportFailed: message => `Export failed: ${message}`,
     modes: {
       models: {
@@ -307,7 +303,7 @@ const COPY = {
         shareBy: ' — created with My AI Rank', addedMsg: 'New model added to the pool below.'
       },
       harnesses: {
-        boardTitle: 'AI Agent Rank', poolTitle: 'Agent', addPlaceholder: 'Add a new agent…',
+        boardTitle: 'AI Agent Rank', poolTitle: 'Agents', addPlaceholder: 'Add a new agent…',
         removeTitle: 'Remove this agent', dragHint: 'Drag an agent card into a tier • ',
         file: 'my-ai-rank-agents.png', shareTitle: 'My AI Agent Rank',
         shareBy: ' — created with My AI Rank', addedMsg: 'New agent added to the pool below.'
@@ -359,9 +355,13 @@ function iconFor(key, label) {
   return `<span class="provider-icon" style="background:${bg};color:${p.color}">${initial}</span>`;
 }
 
+function defaultItemsFor(targetMode) {
+  return DEFAULTS[targetMode].map((item, sort) => ({ ...item, tier: 'pool', sort }));
+}
+
 const state = {
-  models: DEFAULTS.models.map((m, i) => ({ ...m, tier: 'pool', sort: i })),
-  harnesses: DEFAULTS.harnesses.map((m, i) => ({ ...m, tier: 'pool', sort: i }))
+  models: defaultItemsFor('models'),
+  harnesses: defaultItemsFor('harnesses')
 };
 const initialParams = new URLSearchParams(location.search);
 let mode = initialParams.get('mode') === 'harnesses' ? 'harnesses' : 'models';
@@ -453,7 +453,6 @@ function bindCard(el, m) {
       e.stopPropagation();
       state[mode] = items().filter(x => x.id !== m.id);
       render();
-      setStatus(COPY[language].removed(m.name), 'info');
     });
   }
   el.addEventListener('dragstart', e => {
@@ -717,7 +716,7 @@ function applyUi() {
     t.classList.toggle('active', on);
     t.setAttribute('aria-pressed', String(on));
   });
-  document.title = `My AI Rank — ${mode === 'models' ? 'Models' : 'Agent'}`;
+  document.title = `My AI Rank — ${mode === 'models' ? 'Models' : 'Agents'}`;
   document.querySelector('meta[name="description"]').content = text.subtitle;
   document.getElementById('page-subtitle').textContent = text.subtitle;
   nameInput.placeholder = text.namePlaceholder;
@@ -751,9 +750,16 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-export').addEventListener('click', () => exportPNG(true));
   document.getElementById('btn-copy').addEventListener('click', copyToClipboard);
   document.getElementById('btn-reset').addEventListener('click', () => {
-    items().forEach(m => m.tier = 'pool');
+    const customItems = items().filter(item => item.custom);
+    state[mode] = [
+      ...defaultItemsFor(mode),
+      ...customItems.map((item, index) => ({
+        ...item,
+        tier: 'pool',
+        sort: DEFAULTS[mode].length + index
+      }))
+    ];
     render();
-    setStatus(COPY[language].resetDone, 'info');
   });
 
   document.getElementById('add-form').addEventListener('submit', e => {
