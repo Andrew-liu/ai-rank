@@ -284,13 +284,17 @@ html[lang="zh-CN"] .tier-label {
   font-family: var(--font-display);
   font-size: 0.95rem;
   color: var(--ink);
-  transition: transform 0.1s, border-color 0.1s;
+  transition: border-color 0.1s;
   position: relative;
 }
 
 .model-card:hover { border-color: var(--accent); }
 
-.model-card.dragging { opacity: 0.4; }
+.model-card.dragging {
+  opacity: 0.28;
+  border-color: var(--accent);
+  z-index: 4;
+}
 
 .model-card .provider-icon {
   width: 22px;

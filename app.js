@@ -377,6 +377,7 @@ function visibleTiers() {
     : EN_TIER_ORDER.map(tier => ({ key: tier, label: tier, source: [tier] }));
 }
 let dragId = null;
+let dragCommitted = false;
 
 const tierRowsEl = document.getElementById('tier-rows');
 const poolListEl = document.getElementById('pool-list');
@@ -385,6 +386,90 @@ const boardAuthorEl = document.getElementById('board-author');
 const nameInput = document.getElementById('name');
 const handleInput = document.getElementById('handle');
 const statusEl = document.getElementById('status');
+
+function findDraggedCard() {
+  return [...document.querySelectorAll('.model-card')].find(el => el.dataset.id === dragId);
+}
+
+function insertionPoint(zone, x, y, dragged) {
+  const cards = [...zone.children].filter(el => el.classList.contains('model-card') && el !== dragged);
+  if (!cards.length) return null;
+
+  const rows = [];
+  for (const card of cards) {
+    const rect = card.getBoundingClientRect();
+    let row = rows.find(entry => Math.abs(entry.top - rect.top) < 8);
+    if (!row) {
+      row = { top: rect.top, centerY: rect.top + rect.height / 2, cards: [] };
+      rows.push(row);
+    }
+    row.cards.push({ card, rect });
+  }
+  rows.sort((a, b) => a.top - b.top);
+  const row = rows.reduce((best, entry) =>
+    Math.abs(entry.centerY - y) < Math.abs(best.centerY - y) ? entry : best
+  );
+  row.cards.sort((a, b) => a.rect.left - b.rect.left);
+  const before = row.cards.find(entry => x < entry.rect.left + entry.rect.width / 2);
+  if (before) return before.card;
+
+  const last = row.cards[row.cards.length - 1].card;
+  let next = last.nextElementSibling;
+  while (next === dragged) next = next.nextElementSibling;
+  return next;
+}
+
+function animateCardReorder(dragged, zone, before) {
+  const oldZone = dragged.parentElement;
+  const tracked = new Set([
+    ...oldZone.querySelectorAll('.model-card:not(.dragging)'),
+    ...zone.querySelectorAll('.model-card:not(.dragging)')
+  ]);
+  const first = new Map([...tracked].map(el => [el, el.getBoundingClientRect()]));
+
+  if (before) zone.insertBefore(dragged, before);
+  else zone.appendChild(dragged);
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  tracked.forEach(el => {
+    const start = first.get(el);
+    const end = el.getBoundingClientRect();
+    const dx = start.left - end.left;
+    const dy = start.top - end.top;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    el.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }],
+      { duration: 180, easing: 'cubic-bezier(.2,.8,.2,1)' }
+    );
+  });
+}
+
+function reorderDraggedCard(zone, x, y) {
+  if (!dragId || zone === poolListEl) return;
+  const dragged = findDraggedCard();
+  if (!dragged) return;
+  const before = insertionPoint(zone, x, y, dragged);
+  const alreadyPlaced = dragged.parentElement === zone
+    && (before ? dragged.nextElementSibling === before : dragged === zone.lastElementChild);
+  if (!alreadyPlaced) animateCardReorder(dragged, zone, before);
+}
+
+function commitCardOrder(zone, moved) {
+  const targetTier = zone.dataset.tier || 'pool';
+  moved.tier = targetTier;
+  if (targetTier === 'pool') {
+    moved.sort = items().length;
+    return;
+  }
+
+  document.querySelectorAll('.tier-lane').forEach(lane => {
+    [...lane.children].forEach((card, index) => {
+      const item = items().find(entry => entry.id === card.dataset.id);
+      if (!item || item.id === moved.id && lane !== zone) return;
+      item.sort = index;
+    });
+  });
+}
 
 function readHandle() {
   let h = handleInput.value.trim();
@@ -463,6 +548,7 @@ function bindCard(el, m) {
   }
   el.addEventListener('dragstart', e => {
     dragId = m.id;
+    dragCommitted = false;
     e.dataTransfer.setData('text/plain', m.id);
     e.dataTransfer.effectAllowed = 'move';
     // Use a clean off-screen clone as the drag preview. Without this the
@@ -481,10 +567,12 @@ function bindCard(el, m) {
     requestAnimationFrame(() => el.classList.add('dragging'));
   });
   el.addEventListener('dragend', () => {
+    const shouldRestore = !dragCommitted;
     dragId = null;
     el.classList.remove('dragging');
     if (el._ghost) { el._ghost.remove(); el._ghost = null; }
     document.querySelectorAll('.drag-over').forEach(x => x.classList.remove('drag-over'));
+    if (shouldRestore) render();
   });
 }
 
@@ -493,8 +581,10 @@ function bindLane(zone) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     zone.classList.add('drag-over');
+    reorderDraggedCard(zone, e.clientX, e.clientY);
   });
-  zone.addEventListener('dragleave', () => {
+  zone.addEventListener('dragleave', e => {
+    if (e.relatedTarget && zone.contains(e.relatedTarget)) return;
     zone.classList.remove('drag-over');
   });
   zone.addEventListener('drop', e => {
@@ -504,10 +594,12 @@ function bindLane(zone) {
     if (!id) return;
     const m = items().find(x => x.id === id);
     if (!m) return;
-    m.tier = zone.dataset.tier || 'pool';
-    // Append moved entry to end of its tier for stable order
-    const maxSort = Math.max(0, ...items().filter(x => x.tier === m.tier && x.id !== id).map(x => x.sort), -1);
-    m.sort = maxSort + 1;
+    const dragged = findDraggedCard();
+    if (dragged && dragged.parentElement !== zone && zone !== poolListEl) {
+      animateCardReorder(dragged, zone, insertionPoint(zone, e.clientX, e.clientY, dragged));
+    }
+    dragCommitted = true;
+    commitCardOrder(zone, m);
     render();
   });
 }
