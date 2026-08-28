@@ -72,6 +72,12 @@ const PROVIDERS = {
     viewBox: '0 0 24 24',
     path: "M12.606 1.806l-1.677 2.388c-0.258 0.374-0.697 0.606-1.161 0.606h-9.162V1.794C.594 1.806 12.606 1.806 12.606 1.806zM24 1.806L9.6 22.206 0 22.206 14.4 1.806zM11.394 22.206l1.69-2.4c.258-.374 .697-.606 1.161-.606h9.149v3.006H11.394z"
   },
+  ornith: {
+    name: 'Ornith',
+    bg: '#2d2e33',
+    type: 'img',
+    img: 'logos/ornith.png'
+  },
   fable: {
     name: 'Fable',
     bg: '#FF6B35',
@@ -208,6 +214,7 @@ const DEFAULTS = {
     { id: 'm15', name: 'Gemini 3.7 Flash', provider: 'google' },
     { id: 'm11', name: 'glm-5.2', provider: 'zhipu' },
     { id: 'm8', name: 'glm-5.3', provider: 'zhipu' },
+    { id: 'm24', name: 'GLM-5.3-Flash', provider: 'zhipu' },
     { id: 'm21', name: 'gpt-5.5', provider: 'openai' },
     { id: 'm7', name: 'gpt-5.6-luna', provider: 'openai' },
     { id: 'm2', name: 'gpt-5.6-sol', provider: 'openai' },
@@ -216,9 +223,12 @@ const DEFAULTS = {
     { id: 'm5', name: 'Grok 4.6', provider: 'grok' },
     { id: 'm4', name: 'kimi k3', provider: 'kimi' },
     { id: 'm19', name: 'Muse Spark 1.2', provider: 'meta' },
+    { id: 'm27', name: 'Ornith-1.5-35B', provider: 'ornith' },
     { id: 'm22', name: 'Opus 4.8', provider: 'anthropic' },
     { id: 'm9', name: 'Opus 5', provider: 'anthropic' },
     { id: 'm23', name: 'Ox Alpha', provider: 'other' },
+    { id: 'm26', name: 'Qwen-3.8-27B', provider: 'qwen' },
+    { id: 'm25', name: 'Qwen-3.8-Flash-Next', provider: 'qwen' },
     { id: 'm17', name: 'Qwen-3.8-max', provider: 'qwen' },
     { id: 'm13', name: 'Sonnet 5', provider: 'anthropic' }
   ],
@@ -246,7 +256,7 @@ const DEFAULTS = {
 };
 
 const MODE_PROVIDERS = {
-  models: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'kimi', 'qwen', 'zhipu', 'meta', 'cognition', 'cursor', 'other'],
+  models: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'kimi', 'qwen', 'zhipu', 'ornith', 'meta', 'cognition', 'cursor', 'other'],
   harnesses: ['antigravity', 'anthropic', 'cline', 'codebuddy', 'openai', 'commandcode', 'cursor', 'deepseek', 'github', 'grok', 'nous', 'kimi', 'opencode', 'pi', 'qwen', 't3code', 'traecode', 'workbuddy', 'zhipu', 'other']
 };
 
