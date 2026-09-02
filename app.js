@@ -72,6 +72,12 @@ const PROVIDERS = {
     viewBox: '0 0 24 24',
     path: "M12.606 1.806l-1.677 2.388c-0.258 0.374-0.697 0.606-1.161 0.606h-9.162V1.794C.594 1.806 12.606 1.806 12.606 1.806zM24 1.806L9.6 22.206 0 22.206 14.4 1.806zM11.394 22.206l1.69-2.4c.258-.374 .697-.606 1.161-.606h9.149v3.006H11.394z"
   },
+  tencenthy: {
+    name: 'Tencent Hy',
+    bg: '#ffffff',
+    type: 'img',
+    img: 'logos/tencent-hy.svg'
+  },
   ornith: {
     name: 'Ornith',
     bg: '#2d2e33',
@@ -209,6 +215,7 @@ const DEFAULTS = {
     { id: 'm6', name: 'deepseek v4 flash', provider: 'deepseek' },
     { id: 'm14', name: 'deepseek v4 pro', provider: 'deepseek' },
     { id: 'm1', name: 'Fable 5', provider: 'anthropic' },
+    { id: 'm28', name: 'Fable 5.1', provider: 'anthropic' },
     { id: 'm16', name: 'Gemini 3.1 Pro', provider: 'google' },
     { id: 'm20', name: 'Gemini 3.6 Flash', provider: 'google' },
     { id: 'm15', name: 'Gemini 3.7 Flash', provider: 'google' },
@@ -221,6 +228,7 @@ const DEFAULTS = {
     { id: 'm12', name: 'gpt-5.6-terra', provider: 'openai' },
     { id: 'm3', name: 'Grok 4.5', provider: 'grok' },
     { id: 'm5', name: 'Grok 4.6', provider: 'grok' },
+    { id: 'm29', name: 'Hy4 preview', provider: 'tencenthy' },
     { id: 'm4', name: 'kimi k3', provider: 'kimi' },
     { id: 'm19', name: 'Muse Spark 1.2', provider: 'meta' },
     { id: 'm27', name: 'Ornith-1.5-35B', provider: 'ornith' },
@@ -256,7 +264,7 @@ const DEFAULTS = {
 };
 
 const MODE_PROVIDERS = {
-  models: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'kimi', 'qwen', 'zhipu', 'ornith', 'meta', 'cognition', 'cursor', 'other'],
+  models: ['openai', 'anthropic', 'xai', 'grok', 'deepseek', 'google', 'tencenthy', 'kimi', 'qwen', 'zhipu', 'ornith', 'meta', 'cognition', 'cursor', 'other'],
   harnesses: ['antigravity', 'anthropic', 'cline', 'codebuddy', 'openai', 'commandcode', 'cursor', 'deepseek', 'github', 'grok', 'nous', 'kimi', 'opencode', 'pi', 'qwen', 't3code', 'traecode', 'workbuddy', 'zhipu', 'other']
 };
 
